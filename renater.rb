@@ -22,9 +22,9 @@ $ip_to_bust = []
 def parse_line(line)
   line_split = line.encode('UTF-8', invalid: :replace).split(' ')
   timestamp = Time.at(line_split.first.to_i)
-  # If timestamps are equal
+  # If timestamps are within 30s of each other (to account for connexion delays)
   # AND if IP matches 3rd field
-  if (-3..3).include?(timestamp - $datetime_to_time) && line.include?($malware_ip)
+  if (-15..15).include?(timestamp - $datetime_to_time) && line.include?($malware_ip)
     $ip_to_bust << line_split[2] # Add bad Res IP to the array
     $stop = true # Exit files loop if we find one or several matches
     return line
@@ -33,7 +33,7 @@ def parse_line(line)
 end
 
 
-p 'Enter formatted date (2016-11-09 22:16:46+01:00): '
+p 'Enter formatted date (2016-11-09 22:16:46+01:00):'
 date = gets.chomp
 $datetime = DateTime.parse(date)
 $datetime_to_time = $datetime.to_time
@@ -68,7 +68,7 @@ log_files.each do |file|
   end
   if $stop
     p 'Stopping search, should have found enough results...'
-    p "Bad IPs: #{$ip_to_bust.join(', ')}"
+    p "Bad IPs: #{$ip_to_bust.uniq.join(', ')}"
     break
   end
 end

@@ -12,10 +12,9 @@ This script allows us to quickly comply with the request, by providing both date
 ## Usage
 
   1. SSH to the proxy indicated in the report.
-
-  2. Run `ruby renater.rb`, placed in the folder where all the logs are (usually `/home/squid3`).
-
-  3. Enter date as provided in the report, and the destination IP.
+  2. `cd` to the squid logs folder (usually `/home/squid3`)
+  3. Run `ruby renater.rb`.
+  4. Enter date as provided in the report, and the destination IP.
 
 ## Author
 Thomas 'Nymous' Gaudin

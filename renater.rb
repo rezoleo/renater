@@ -13,7 +13,7 @@ require 'date'
 require 'zlib'
 
 $stop = false
-$ip_to_bust = []
+$ips_to_bust = {}
 
 # Parse a squid3 log line for matching parameters
 # Example line: 1478759119.952    559 172.30.227.23 TCP_CLIENT_REFRESH_MISS/200 639 GET http://163.172.84.20/hls/02/index.m3u8? - ORIGINAL_DST/163.172.84.20 application/vnd.apple.mpegurl
@@ -25,7 +25,7 @@ def parse_line(line)
   # If timestamps are within 30s of each other (to account for connexion delays)
   # AND if IP matches 3rd field
   if (-15..15).include?(timestamp - $datetime_to_time) && line.include?($malware_ip)
-    $ip_to_bust << line_split[2] # Add bad Res IP to the array
+    $ips_to_bust[line_split[2] ] = timestamp.to_s # Add bad Res IP to the hash
     $stop = true # Exit files loop if we find one or several matches
     return line
   end
@@ -33,7 +33,7 @@ def parse_line(line)
 end
 
 
-p 'Enter formatted date (2016-11-09 22:16:46+01:00):'
+p 'Enter formatted date (2016-11-10 07:25:19+01:00):'
 date = gets.chomp
 $datetime = DateTime.parse(date)
 $datetime_to_time = $datetime.to_time
@@ -68,7 +68,11 @@ log_files.each do |file|
   end
   if $stop
     p 'Stopping search, should have found enough results...'
-    p "Bad IPs: #{$ip_to_bust.uniq.join(', ')}"
+    p "Bad IPs:"
+    $ips_to_bust.each do |bad_ip, connexion_date|
+      p "  #{bad_ip.ljust(14)} at #{connexion_date}" # Left pad the string to 15 chars, e.g. '172.30.221.30 '
+    end
+    p "Happy busting!"
     break
   end
 end

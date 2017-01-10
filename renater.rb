@@ -33,46 +33,46 @@ def parse_line(line)
 end
 
 
-p 'Enter formatted date (2016-11-10 07:25:19+01:00):'
+puts 'Enter formatted date (2016-11-10 07:25:19+01:00):'
 date = gets.chomp
 $datetime = DateTime.parse(date)
 $datetime_to_time = $datetime.to_time
 
-p 'Enter malicious IP: '
+puts 'Enter malicious IP: '
 $malware_ip = gets.chomp
 
-p "Looking for IP #{$malware_ip} around #{$datetime.to_s}."
-p "Working folder is #{Dir.pwd}"
+puts "Looking for IP #{$malware_ip} around #{$datetime.to_s}."
+puts "Working folder is #{Dir.pwd}"
 log_files = Dir.glob('access.log*')
 
 # This sorts access.log.2.gz before access.log.10.gz
 log_files.sort_by! {|s| s[/\d+/].to_i}
 
 log_files.each do |file|
-  p "Searching in #{file}..."
+  puts "Searching in #{file}..."
   case File.extname file
     when '.gz'
       Zlib::GzipReader.open(file) do |gz|
         gz.readlines.reverse_each do |line|
           l = parse_line(line)
-          p "#{gz.lineno}: #{l}" if l && ENV["DEBUG_RENATER"] == 'true'
+          puts "#{gz.lineno}: #{l}" if l && ENV["DEBUG_RENATER"] == 'true'
         end
       end
     else
       File.open(file) do |f|
         f.readlines.reverse_each do |line|
           l = parse_line(line)
-          p "#{f.lineno}: #{l}" if l && ENV["DEBUG_RENATER"] == 'true'
+          puts "#{f.lineno}: #{l}" if l && ENV["DEBUG_RENATER"] == 'true'
         end
       end
   end
   if $stop
-    p 'Stopping search, should have found enough results...'
-    p "Bad IPs:"
+    puts 'Stopping search, should have found enough results...'
+    puts "Bad IPs:"
     $ips_to_bust.each do |bad_ip, connexion_date|
-      p "  #{bad_ip.ljust(14)} at #{connexion_date}" # Left pad the string to 15 chars, e.g. '172.30.221.30 '
+      puts "  #{bad_ip.ljust(14)} at #{connexion_date}" # Left pad the string to 15 chars, e.g. '172.30.221.30 '
     end
-    p "Happy busting!"
+    puts "Happy busting!"
     break
   end
 end

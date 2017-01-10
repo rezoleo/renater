@@ -55,14 +55,14 @@ log_files.each do |file|
       Zlib::GzipReader.open(file) do |gz|
         gz.readlines.reverse_each do |line|
           l = parse_line(line)
-          p "#{gz.lineno}: #{l}" if l
+          p "#{gz.lineno}: #{l}" if l && ENV["DEBUG_RENATER"] == 'true'
         end
       end
     else
       File.open(file) do |f|
         f.readlines.reverse_each do |line|
           l = parse_line(line)
-          p "#{f.lineno}: #{l}" if l
+          p "#{f.lineno}: #{l}" if l && ENV["DEBUG_RENATER"] == 'true'
         end
       end
   end

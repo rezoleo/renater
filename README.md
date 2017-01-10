@@ -16,6 +16,8 @@ This script allows us to quickly comply with the request, by providing both date
   3. Run `ruby renater.rb`.
   4. Enter date as provided in the report, and the destination IP.
 
+If you want to debug the script (display more info, basically), just `export DEBUG_RENATER='true'` before running it.
+
 ## Author
 Thomas 'Nymous' Gaudin
 

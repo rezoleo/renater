@@ -15,6 +15,7 @@ require 'ipaddr'
 
 $stop = false
 $ips_to_bust = {}
+$datetime = nil
 $malware_ip = nil
 
 # Parse a squid3 log line for matching parameters
@@ -35,9 +36,15 @@ def parse_line(line)
 end
 
 
-puts 'Enter formatted date (2016-11-10 07:25:19+01:00):'
-date = gets.chomp
-$datetime = DateTime.parse(date)
+while $datetime.nil?
+  puts 'Enter formatted date (2016-11-10 07:25:19+01:00):'
+  begin
+    $datetime = DateTime.parse(gets.chomp)
+  rescue ArgumentError => e
+    puts 'Wrong date, try again!'
+    $datetime = nil
+  end
+end
 $datetime_to_time = $datetime.to_time
 
 while $malware_ip.nil? || !$malware_ip.ipv4?

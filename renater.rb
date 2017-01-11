@@ -44,7 +44,7 @@ end
 
 
 while $datetime.nil?
-  puts 'Enter formatted date (2016-11-10 07:25:19+01:00):'
+  print 'Enter formatted date (2016-11-10 07:25:19+01:00): '
   begin
     $datetime = DateTime.parse(gets.chomp)
   rescue ArgumentError => e
@@ -55,7 +55,7 @@ end
 $datetime_to_time = $datetime.to_time
 
 while $malware_ip.nil? || !$malware_ip.ipv4?
-  puts 'Enter malicious IP: '
+  print 'Enter malicious IP: '
   begin
     $malware_ip = IPAddr.new gets.chomp
   rescue IPAddr::InvalidAddressError => e
@@ -64,8 +64,10 @@ while $malware_ip.nil? || !$malware_ip.ipv4?
   end
 end
 
+puts ''
 puts "Looking for IP #{$malware_ip} around #{$datetime.to_s}."
 puts "Working folder is #{Dir.pwd}"
+puts ''
 log_files = Dir.glob('access.log*')
 
 # This sorts access.log.2.gz before access.log.10.gz
@@ -93,15 +95,18 @@ begin
 
 
     if $stop
+      puts ''
       puts 'Stopping search, should have found enough results...'
       puts 'Bad IPs:'
       $ips_to_bust.each do |bad_ip, connexion_date|
         puts "  #{bad_ip.ljust(14)} at #{connexion_date}" # Left pad the string to 15 chars, e.g. '172.30.221.30 '
       end
+      puts ''
       puts 'Happy busting!'
       break
     end
   end
 rescue Renater::TooFarBehindError => e
-  puts "We're too far back! What's this T-Rex doing here?"
+  puts ''
+  puts "Stop this! We're too far back! (What is this T-Rex doing here?)"
 end

@@ -11,9 +11,11 @@ $VERBOSE = true
 
 require 'date'
 require 'zlib'
+require 'ipaddr'
 
 $stop = false
 $ips_to_bust = {}
+$malware_ip = nil
 
 # Parse a squid3 log line for matching parameters
 # Example line: 1478759119.952    559 172.30.227.23 TCP_CLIENT_REFRESH_MISS/200 639 GET http://163.172.84.20/hls/02/index.m3u8? - ORIGINAL_DST/163.172.84.20 application/vnd.apple.mpegurl
@@ -24,7 +26,7 @@ def parse_line(line)
   timestamp = Time.at(line_split.first.to_i)
   # If timestamps are within 30s of each other (to account for connexion delays)
   # AND if IP matches 3rd field
-  if (-15..15).include?(timestamp - $datetime_to_time) && line.include?($malware_ip)
+  if (-15..15).include?(timestamp - $datetime_to_time) && line.include?($malware_ip.to_s)
     $ips_to_bust[line_split[2] ] = timestamp.to_s # Add bad Res IP to the hash
     $stop = true # Exit files loop if we find one or several matches
     return line
@@ -38,8 +40,15 @@ date = gets.chomp
 $datetime = DateTime.parse(date)
 $datetime_to_time = $datetime.to_time
 
-puts 'Enter malicious IP: '
-$malware_ip = gets.chomp
+while $malware_ip.nil? || !$malware_ip.ipv4?
+  puts 'Enter malicious IP: '
+  begin
+    $malware_ip = IPAddr.new gets.chomp
+  rescue IPAddr::InvalidAddressError => e
+    puts 'Wrong address, try again!'
+    $malware_ip = nil
+  end
+end
 
 puts "Looking for IP #{$malware_ip} around #{$datetime.to_s}."
 puts "Working folder is #{Dir.pwd}"
